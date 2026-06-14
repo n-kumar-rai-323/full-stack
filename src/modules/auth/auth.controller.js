@@ -1,43 +1,29 @@
-const User = require("./auth.model");
-class authController {
-  async register(req, res, next) {
+const cloudinarySvc = require("../../services/cloudinary.service");
+
+class AuthController {
+  registerUser = async (req, res, next) => {
     try {
-      const payload = req.body;
+      let payload = req.body;
 
-      if (!payload.email || !payload.password) {
-        return res.status(400).json({
-          message: "Email and password are required",
+      if (!req.file) {
+        return next({
+          code: 400,
+          message: "No file uploaded",
+          status: "FILE_REQUIRED",
         });
       }
 
-      const existingUser = await User.findOne({ email: payload.email });
+      let image = await cloudinarySvc.uploadFile(req.file.path, "user/");
 
-      if (existingUser) {
-        return res.status(400).json({
-          message: "User already exists",
-        });
-      }
-      const newUser = await User.create(payload);
-      return res.status(201).json({
-        message: "User created successfully",
-        user: newUser,
+      res.json({
+        data: { payload, image },
       });
-    } catch (error) {
-      next(error);
+
+    } catch (err) {
+      next(err);
     }
-  }
-  async getUsersAll(req,res,next){
-    try{
-      const users = await User.find();
-      return res.json({
-        data:users,
-        message:"All users retrieved successfully",
-        status:"success",
-      })
-    }catch(exception){
-      next(exception)
-    }
-  }
+  };
 }
-const authCtrl = new authController();
+
+const authCtrl = new AuthController();
 module.exports = authCtrl;
