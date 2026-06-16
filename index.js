@@ -7,8 +7,8 @@ const dbInit = require("./src/config/mongodb.config");
 const { connectPostgres } = require("./src/config/pg");
 
 // DB START
-dbInit();
-connectPostgres();
+// dbInit();
+// connectPostgres();
 
 const server = http.createServer(app);
 

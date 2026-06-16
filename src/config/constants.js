@@ -4,4 +4,13 @@ const UserRole={
     CUSTOMER:"customer"
 }
 
-module.exports = {UserRole}
+const Gender={
+    MALE:"male",
+    FEMALE:"female",
+    OTHER:"other"
+}
+const UserStatus={
+    ACTIVE:"active",
+    INACTIVE:"inactive"
+}
+module.exports = {UserRole,Gender,UserStatus}

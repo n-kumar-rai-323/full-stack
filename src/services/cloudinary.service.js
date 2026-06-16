@@ -25,9 +25,13 @@ class CloudinaryService {
         fetch_format: "auto",
       });
 
-      return { uploadResult, optimizedUrl };
+      // return { uploadResult, optimizedUrl };
+      return {
+        url: uploadResult.secure_url,
+        optimizedUrl: optimizedUrl,
+      };
     } catch (exception) {
-      console.log(exception)
+      next(exception);
     }
   };
 }

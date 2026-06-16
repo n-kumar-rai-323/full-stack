@@ -1,27 +1,30 @@
-// const { Sequelize } = require("sequelize");
+const { Sequelize } = require("sequelize");
+const { localPGSqlConfig } = require("./config");
 
-// const sequelize = new Sequelize(
-//   "mydb",
-//   "postgres",
-//   "1234",
-//   {
-//     host: "localhost",
-//     port: 5432,
-//     dialect: "postgres",
-//     logging: false
-//   }
-// );
+const db = localPGSqlConfig.pgdb;
 
-// const pgConnect = async () => {
-//   try {
-//     await sequelize.authenticate();
-//     console.log("Postgres connected successfully");
-//   } catch (error) {
-//     console.log("Connection failed:", error);
-//     process.exit(1);
-//   }
-// };
+// Create Sequelize instance
+const sequelize = new Sequelize(
+  db.name,
+  db.username,   
+  db.password,
+  {
+    host: db.host,
+    port: db.port,
+    dialect: db.dialect,
+    logging: false,
+  }
+);
 
-// pgConnect();
+// Test connection
+const pgConnect = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log("✅ Postgres connected successfully");
+  } catch (error) {
+    console.error("❌ Connection failed:", error.message);
+    process.exit(1);
+  }
+};
 
-// module.exports = sequelize;
+module.exports = { sequelize, pgConnect };

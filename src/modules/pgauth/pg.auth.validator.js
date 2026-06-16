@@ -2,16 +2,25 @@ const Joi = require('joi');
 const { UserRole } = require("../../config/constants");
 
 const pgAuthValidatorDTO = Joi.object({
-  name: Joi.string().max(50).min(2).required(),
+  name: Joi.string().min(2).max(50).required(),
   email: Joi.string().email().required(),
   password: Joi.string().required(),
-  confirmPassword: Joi.string().valid(Joi.ref("password")).required().messages({
-    "any.only": "Confirm password does not match password",
-  }),
-  phone: Joi.string().allow(null, "").default(null),
-  role: Joi.string()
-    .valid(UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SELLER)
-    .default(UserRole.CUSTOMER),
-});
 
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("password"))
+    .required()
+    .messages({
+      "any.only": "Password mismatch",
+    }),
+
+  role: Joi.string().valid("ADMIN", "CUSTOMER", "SELLER").default("CUSTOMER"),
+
+  gender: Joi.string().required(),
+
+  phoneCountryCode: Joi.number().optional(),
+  phoneNumber: Joi.number().optional(),
+
+  billingAddress: Joi.string().optional(),
+  shippingAddress: Joi.string().optional(),
+});
 module.exports = { pgAuthValidatorDTO };

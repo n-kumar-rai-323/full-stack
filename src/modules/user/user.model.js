@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Gender,UserRole,UserStatus} = require("../../config/constants");
+const { Gender } = require("../../config/constants");
 
 const UserSchema = new mongoose.Schema(
   {
@@ -10,18 +10,6 @@ const UserSchema = new mongoose.Schema(
       required: true,
     },
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-
-    password: {
-      type: String,
-      required: true,
-    },
     gender: {
       type: String,
       enum: [Gender.FEMALE, Gender.MALE, Gender.OTHER],
@@ -40,17 +28,12 @@ const UserSchema = new mongoose.Schema(
 
     image: {
       url: String,
-      optimizedUrl: String,
-    },
-    role: {
-      type: String,
-      enum: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SELLER],
-      default: UserRole.CUSTOMER,
+      optimizeUrl: String,
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 module.exports = mongoose.model("User", UserSchema);
