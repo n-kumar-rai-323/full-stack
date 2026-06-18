@@ -10,9 +10,6 @@ module.exports = {
         primaryKey: true,
       },
 
-      // =====================
-      // Identity
-      // =====================
       name: {
         type: Sequelize.STRING(50),
         allowNull: false,
@@ -29,9 +26,6 @@ module.exports = {
         allowNull: false,
       },
 
-      // =====================
-      // Role & Access
-      // =====================
       role: {
         type: Sequelize.ENUM("ADMIN", "CUSTOMER", "SELLER"),
         defaultValue: "CUSTOMER",
@@ -42,47 +36,41 @@ module.exports = {
         defaultValue: "INACTIVE",
       },
 
-      // =====================
-      // Profile
-      // =====================
       gender: {
         type: Sequelize.ENUM("MALE", "FEMALE", "OTHER"),
         allowNull: true,
       },
 
-      phone_countryCode: {
+      phoneCountryCode: {
         type: Sequelize.INTEGER,
         allowNull: true,
       },
 
-      phone_number: {
+      phoneNumber: {
         type: Sequelize.BIGINT,
         allowNull: true,
       },
 
-      billing_address: {
+      billingAddress: {
         type: Sequelize.STRING,
         allowNull: true,
       },
 
-      shipping_address: {
+      shippingAddress: {
         type: Sequelize.STRING,
         allowNull: true,
       },
 
-      image_url: {
+      imageUrl: {
         type: Sequelize.STRING,
         allowNull: true,
       },
 
-      optimized_image_url: {
+      optimizedImageUrl: {
         type: Sequelize.STRING,
         allowNull: true,
       },
 
-      // =====================
-      // Security
-      // =====================
       activationCode: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -103,9 +91,6 @@ module.exports = {
         allowNull: true,
       },
 
-      // =====================
-      // Timestamps
-      // =====================
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -5,7 +5,7 @@ const db = localPGSqlConfig.pgdb;
 
 // Create Sequelize instance
 const sequelize = new Sequelize(
-  db.name,
+  db.database,
   db.username,   
   db.password,
   {

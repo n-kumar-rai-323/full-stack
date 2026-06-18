@@ -7,17 +7,21 @@ const bodyValidator = (schema) => {
 
       req.body = response;
       next();
-
     } catch (exception) {
       let messageBag = {};
 
-      for (const val of exception.details) {
-        let key = val.path?.[0];
-        let msg = val.message;
-        messageBag[key] = msg;
+      // 🔥 SAFE CHECK (IMPORTANT)
+      if (exception?.details && Array.isArray(exception.details)) {
+        for (const val of exception.details) {
+          let key = val.path?.[0];
+          let msg = val.message;
+          messageBag[key] = msg;
+        }
+      } else {
+        messageBag.general = exception.message || "Validation error";
       }
 
-      next({
+      return next({
         details: messageBag,
         code: 400,
         message: "Validation Failed",
@@ -27,4 +31,4 @@ const bodyValidator = (schema) => {
   };
 };
 
-module.exports=bodyValidator;
+module.exports = bodyValidator;

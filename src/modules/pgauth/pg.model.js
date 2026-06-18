@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const { sequelize } = require("../../config/pg.config"); 
-const { UserRole, Gender, UserStatus } = require("../../config/constants");
+const { sequelize } = require("../../config/pg.config");
+const { UserRole, Gender, UserStatus } = require("../../config/pgConstants");
 
 const User = sequelize.define(
   "User",
@@ -8,20 +8,14 @@ const User = sequelize.define(
     _id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
       primaryKey: true,
     },
 
-    // =====================
-    // AUTH INFO (combined model)
-    // =====================
     email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true,
-      },
+      validate: { isEmail: true },
     },
 
     password: {
@@ -39,9 +33,6 @@ const User = sequelize.define(
       defaultValue: UserStatus.INACTIVE,
     },
 
-    // =====================
-    // PROFILE INFO
-    // =====================
     name: {
       type: DataTypes.STRING(50),
       allowNull: false,
@@ -82,9 +73,6 @@ const User = sequelize.define(
       allowNull: true,
     },
 
-    // =====================
-    // SECURITY
-    // =====================
     activationCode: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -108,7 +96,7 @@ const User = sequelize.define(
   {
     tableName: "users",
     timestamps: true,
-  },
+  }
 );
 
 module.exports = User;

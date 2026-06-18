@@ -13,6 +13,7 @@ const fs = require("fs");
 // connectDB();
 
 // Local MongoDB Connection
+
 const connectDBS = require("./localMongoDb.config");
 connectDBS();
 
@@ -76,5 +77,19 @@ app.use((error, req, res, next) => {
     status,
   });
 });
+// app.use((error, req, res, next) => {
+//   console.log("FULL ERROR =>", error);
+
+//   const code =
+//     typeof error.code === "number"
+//       ? error.code
+//       : 500;
+
+//   res.status(code).json({
+//     error: error.details || null,
+//     message: error.message,
+//     status: error.status || "SERVER_ERROR",
+//   });
+// });
 // Export Express application
 module.exports = app;

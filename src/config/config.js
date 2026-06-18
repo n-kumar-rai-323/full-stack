@@ -39,7 +39,13 @@ const smtpConfig = {
   from: process.env.SMTP_FROM,
 };
 
+const AppConfig={
+  frontUrl:process.env.FRONTEND_URL,
+  jwtSecret:process.env.JWC_SECRET
+}
+
 module.exports = {
+  AppConfig,
   localPGSqlConfig,
   localMongoConfig,
   dbConfig,

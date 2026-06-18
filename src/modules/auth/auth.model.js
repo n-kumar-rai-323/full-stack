@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Gender,UserRole,UserStatus} = require("../../config/constants");
 
-const UserSchema = new mongoose.Schema(
+const AuthSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -29,8 +29,8 @@ const UserSchema = new mongoose.Schema(
     },
 
     phone: {
-      countryCode: Number,
-      phone: Number,
+      phone_countryCode: Number,
+      phone_number: Number,
     },
 
     address: {
@@ -47,10 +47,12 @@ const UserSchema = new mongoose.Schema(
       enum: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SELLER],
       default: UserRole.CUSTOMER,
     },
+    activationCode:String,
+    status:String,
   },
   {
     timestamps: true,
   },
 );
 
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("Auth", AuthSchema);
