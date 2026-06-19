@@ -6,18 +6,48 @@ const { UserStatus } = require("../../config/constants");
 const { randomStringGenerate } = require("../../utilities/helpers");
 const emailSvc = require("../../services/email.service");
 const { AppConfig } = require("../../config/config");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 class AuthService extends BaseService {
   transformAuthData = async (req) => {
-    try {
-      let payload = req.body;
-      payload.image = await cloudinarySvc.uploadFile(req.file.path, "auth/");
-      payload.password = bcrypt.hashSync(payload.password, 12);
-      payload.status = UserStatus.INACTIVE;
-      payload.activationCode = randomStringGenerate(100);
-      return payload;
-    } catch (exception) {
-      throw exception;
+    let payload = req.body;
+
+    // password hash
+    payload.password = bcrypt.hashSync(payload.password, 12);
+
+    // default image
+    payload.image = {
+      url: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+      optimizedUrl: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+    };
+
+    // cloudinary upload
+    if (req.file) {
+      payload.image = await cloudinarySvc.uploadFile(
+        req.file.path,
+        "ecom-auth"
+      );
     }
+
+    // activation system
+    payload.status = "inactive";
+    payload.activationCode = crypto.randomBytes(32).toString("hex");
+
+    return payload;
+  };
+
+  sendActivationEmail = async (user) => {
+    const link = `${AppConfig.frontUrl}activate/${user.activationCode}`;
+
+    await emailSvc.sendEmail({
+      to: user.email,
+      sub: "Activate Your Account",
+      message: `
+        <h2>Hello ${user.name}</h2>
+        <p>Click below to activate your account:</p>
+        <a href="${link}">Activate Account</a>
+      `,
+    });
   };
 
   activationNotify = async (auth) => {
@@ -73,6 +103,78 @@ class AuthService extends BaseService {
       });
     } catch (exception) {
       throw exception;
+    }
+  };
+  getUserPublicProfile = async (user) => {
+    return {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      gender: user.gender,
+      role: user.role,
+      address: user.address,
+      image: user.image,
+      status: user.status,
+    };
+  };
+  sendForgetPasswordEmail = async (user) => {
+    try {
+      // Generate JWT token
+      const token = jwt.sign(
+        {
+          sub: user._id,
+          type: "ForgetPassword",
+        },
+        AppConfig.jwtSecret,
+        {
+          expiresIn: "15m",
+        },
+      );
+
+      // Hash token
+      const hashedToken = crypto
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+
+      // Update user directly
+      const updated = await AuthModel.findByIdAndUpdate(
+        user._id,
+        {
+          $set: {
+            forgetPasswordToken: hashedToken,
+            forgetPasswordExpiry: new Date(Date.now() + 15 * 60 * 1000),
+          },
+        },
+        {
+          returnDocument: "after",
+        },
+      );
+
+      // Reset link
+      const resetLink = `${AppConfig.frontUrl}reset-password/${token}`;
+
+      // Send email
+      await emailSvc.sendEmail({
+        to: user.email,
+        sub: "Reset Password",
+        message: `
+        <h2>Hello ${user.name}</h2>
+
+        <p>Click the link below to reset your password:</p>
+
+        <a href="${resetLink}">
+          Reset Password
+        </a>
+
+        <p>This link expires in 15 minutes.</p>
+      `,
+      });
+
+      return true;
+    } catch (err) {
+      throw err;
     }
   };
 }

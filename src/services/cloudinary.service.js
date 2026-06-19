@@ -31,7 +31,7 @@ class CloudinaryService {
         optimizedUrl: optimizedUrl,
       };
     } catch (exception) {
-      next(exception);
+      throw exception
     }
   };
 }

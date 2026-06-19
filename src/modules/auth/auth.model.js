@@ -1,14 +1,9 @@
 const mongoose = require("mongoose");
-const { Gender,UserRole,UserStatus} = require("../../config/constants");
+const { Gender, UserRole } = require("../../config/constants");
 
 const AuthSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      min: 2,
-      max: 50,
-      required: true,
-    },
+    name: { type: String, required: true, min: 2, max: 50 },
 
     email: {
       type: String,
@@ -22,9 +17,10 @@ const AuthSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     gender: {
       type: String,
-      enum: [Gender.FEMALE, Gender.MALE, Gender.OTHER],
+      enum: [Gender.MALE, Gender.FEMALE, Gender.OTHER],
       required: true,
     },
 
@@ -42,17 +38,20 @@ const AuthSchema = new mongoose.Schema(
       url: String,
       optimizedUrl: String,
     },
+
     role: {
       type: String,
-      enum: [UserRole.ADMIN, UserRole.CUSTOMER, UserRole.SELLER],
+      enum: [UserRole.ADMIN, UserRole.SELLER, UserRole.CUSTOMER],
       default: UserRole.CUSTOMER,
     },
-    activationCode:String,
-    status:String,
+
+    activationCode: { type: String, default: null },
+    status: { type: String, enum: ["active", "inactive"], default: "inactive" },
+
+    forgetPasswordToken: String,
+    forgetPasswordExpiry: Date,
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Auth", AuthSchema);

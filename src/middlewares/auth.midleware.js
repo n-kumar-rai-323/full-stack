@@ -1,46 +1,85 @@
 const jwt = require("jsonwebtoken");
 const { AppConfig } = require("../config/config");
+const authSvc = require("../modules/auth/auth.service");
+const { UserRole } = require("../config/constants");
 
-const auth = () => {
-  return (req, res, next) => {
+const auth = (roles = null) => {
+  return async (req, res, next) => {
     try {
-      let token = req.headers["authorization"];
+      let token = req.headers.authorization;
 
       if (!token) {
         throw {
           code: 401,
-          message: "Authorization token is required.",
           status: "UNAUTHORIZED",
+          message: "Authorization token is required.",
         };
       }
 
-      // Expected format: Bearer <token>
       token = token.split(" ").pop();
 
       const data = jwt.verify(token, AppConfig.jwtSecret);
 
-      // Store decoded payload for later use
-      req.authUser = data;
+      // check token type
+      if (data.type !== "Bearer") {
+        throw {
+          code: 403,
+          status: "ACCESS_DENIED",
+          message: "Bearer token expected.",
+        };
+      }
+
+      // find user FIRST
+      const userDetail = await authSvc.getSingleRowByFilter({
+        _id: data.sub,
+      });
+
+      if (!userDetail) {
+        throw {
+          code: 404,
+          status: "USER_NOT_FOUND",
+          message: "User not found.",
+        };
+      }
+
+      // role check AFTER user is found
+      if (roles) {
+        const allowedRoles = Array.isArray(roles) ? roles : [roles];
+
+        if (
+          userDetail.role !== UserRole.ADMIN &&
+          !allowedRoles.includes(userDetail.role)
+        ) {
+          throw {
+            code: 403,
+            status: "ACCESS_DENIED",
+            message: "You do not have permission to access this resource.",
+          };
+        }
+      }
+
+      // attach user
+      req.loggedInUser =await authSvc.getUserPublicProfile(userDetail);
 
       next();
     } catch (exception) {
       let error = {
         code: 500,
-        message: "Internal Server Error",
         status: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong.",
       };
 
       if (exception.name === "TokenExpiredError") {
         error = {
           code: 401,
-          message: "Token has expired.",
           status: "TOKEN_EXPIRED",
+          message: "Token has expired.",
         };
       } else if (exception.name === "JsonWebTokenError") {
         error = {
           code: 401,
-          message: "Invalid token.",
           status: "INVALID_TOKEN",
+          message: "Invalid token.",
         };
       } else if (exception.code) {
         error = exception;

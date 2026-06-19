@@ -1,36 +1,25 @@
 class BaseService {
-  #modelClass;
-  constructor(_modelClass) {
-    this.#modelClass = _modelClass;
+  constructor(modelClass) {
+    this.modelClass = modelClass;
   }
+
   dataStore = async (data) => {
-    try {
-      const obj = new this.#modelClass(data);
-      return await obj.save();
-    } catch (exception) {
-      throw exception;
-    }
+    return await this.modelClass.create(data);
   };
 
   getSingleRowByFilter = async (filter) => {
-    try {
-      return await this.#modelClass.findOne(filter);
-    } catch (exception) {
-      throw exception;
-    }
+    return await this.modelClass.findOne(filter);
   };
 
   updateOneRowByFilter = async (filter, data) => {
-    try {
-      const update = await this.#modelClass.findOneAndUpdate(
-        filter,
-        { $set: data },
-        { new: true },
-      );
-      return update;
-    } catch (exception) {
-      throw exception;
-    }
+    return await this.modelClass.findOneAndUpdate(
+      filter,
+      { $set: data },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   };
 }
 
